@@ -167,50 +167,84 @@
 }
 </style>
    <script>
- document.getElementById('messageInput').addEventListener('focus', function() {
-    document.getElementById('customKeyboard').classList.remove('hidden'); // Show virtual keyboard
+// Detect if we are on a mobile device
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+const virtualKeyboard = document.getElementById('customKeyboard');
+const messageInput = document.getElementById('messageInput');
+const showKeyboardButton = document.getElementById('showKeyboardButton'); // Button to show keyboard on desktop
+
+// Function to show virtual keyboard
+function showKeyboard() {
+    virtualKeyboard.classList.remove('hidden'); // Show virtual keyboard
+    messageInput.focus(); // Focus input field to show cursor
+}
+
+// Hide virtual keyboard
+function hideKeyboard() {
+    virtualKeyboard.classList.add('hidden'); // Hide virtual keyboard
+}
+
+// If on desktop/laptop, show the virtual keyboard when the button is clicked
+if (!isMobile) {
+    showKeyboardButton.addEventListener('click', function () {
+        showKeyboard();
+    });
+} else {
+    // On mobile, prevent the default keyboard from showing
+    messageInput.addEventListener('focus', function (event) {
+        // Prevent the default mobile keyboard from showing
+        event.preventDefault();
+        showKeyboard();
+    });
+
+    // Optionally hide the keyboard when the input field loses focus on mobile
+    messageInput.addEventListener('blur', function () {
+        hideKeyboard();
+    });
+}
+
+// Hide keyboard when clicking outside the input field on mobile (optional)
+document.addEventListener('click', function (event) {
+    if (!messageInput.contains(event.target) && !virtualKeyboard.contains(event.target)) {
+        hideKeyboard();
+    }
 });
 
+// Handle the keyboard's keys (Backspace, Submit, and regular keys)
 document.querySelectorAll('.key').forEach(key => {
-    key.addEventListener('click', function() {
+    key.addEventListener('click', function () {
         const keyText = key.innerText;
-        const messageInput = document.getElementById('messageInput');
         if (keyText === '←') {
             messageInput.value = messageInput.value.slice(0, -1); // Backspace
         } else if (keyText === '✓') {
-            // Submit logic here (optional)
-            messageInput.blur(); // Hide the keyboard
+            messageInput.blur(); // Hide the keyboard on submit (optional)
         } else {
-            messageInput.value += keyText; // Add key text to input
+            messageInput.value += keyText; // Add text to input field
         }
     });
 });
 
-// Switch between sections
-document.getElementById('numberSwitch').addEventListener('click', function() {
+// Switch sections on keyboard
+document.getElementById('numberSwitch').addEventListener('click', function () {
     document.getElementById('alphabetSection').classList.add('hidden');
     document.getElementById('specialCharSection').classList.add('hidden');
     document.getElementById('emojiSection').classList.add('hidden');
     document.getElementById('numberSection').classList.remove('hidden');
 });
 
-document.getElementById('specialSwitch').addEventListener('click', function() {
+document.getElementById('specialSwitch').addEventListener('click', function () {
     document.getElementById('alphabetSection').classList.add('hidden');
     document.getElementById('numberSection').classList.add('hidden');
     document.getElementById('emojiSection').classList.add('hidden');
     document.getElementById('specialCharSection').classList.remove('hidden');
 });
 
-document.getElementById('emojiSwitch').addEventListener('click', function() {
+document.getElementById('emojiSwitch').addEventListener('click', function () {
     document.getElementById('alphabetSection').classList.add('hidden');
     document.getElementById('numberSection').classList.add('hidden');
     document.getElementById('specialCharSection').classList.add('hidden');
     document.getElementById('emojiSection').classList.remove('hidden');
-});
-
-// Close the virtual keyboard when the input field loses focus
-document.getElementById('messageInput').addEventListener('blur', function() {
-    document.getElementById('customKeyboard').classList.add('hidden'); // Hide keyboard
 });
 
     </script>
